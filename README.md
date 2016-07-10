@@ -79,6 +79,49 @@ public class ChocolateFactory{
   }
 }
 ```
+----
+
+###单例模式的优化
+######单例模式的多线程问题
+多线程时，如果两个线程同时获取实例，第一个线程的new 没有完成即开始第二个线程，则会new出来第二个对象。单例模式就会失效。
+###### 解决办法之一 － 同步锁
+给getInstance() 方法添加synchronized (同步锁),这样一个线程完成后另个线程才能调用。
+
+```java
+public static synchronized ChocolateFactory getInstance(){
+...
+}
+```
+缺陷：同步锁比较耗资源。
+
+###### 解决方法之二 － 急切创建实例
+
+public static ChocolateFactory uniqueInstance= ~~null~~ new ChocolateFactory;
+
+缺陷：巧克力工厂用不到的话也会被new出来，浪费一些内存资源。
+
+###### 解决方法之三 － 双重检查加锁法
+
+```java
+public volatile static ChocolateFactory uniqueInstance=null;
+...
+public static ChocolateFactory getInstance(){
+  if (uniqueInstance == null){
+  //进入同步锁，只要进入过一次，即不会再进入了。节约资源。
+    synchronized (ChocolateFactory.class){
+      if (uniqueInstance == null) {
+        uniqueInstance = new ChocolateFactory();
+        }
+    }
+  }
+  return uniqueInstance;
+}
+```
+
+
+
+
+
 
 
 
